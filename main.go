@@ -9,14 +9,17 @@ import (
 )
 
 func main() {
-	log.Println("Service starting")
+	log.Println("Service starting...")
 
+	//Init data store
 	store, err := data.NewStore()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	//Init handler with router
 	handler := web.NewHandler(store)
 
+	log.Println("...Service ready!")
 	log.Fatal(http.ListenAndServe(":3000", handler.Router))
 }

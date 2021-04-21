@@ -12,25 +12,27 @@ import (
 	"github.com/gorilla/mux"
 )
 
+//NewHandler returns a Handler struct containing a mux router and data store
 func NewHandler(store *data.Store) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),
 		store:  *store,
 	}
 
-	h.HandleFunc("/", h.TodoList()).Methods("GET", "DELETE")
-	h.HandleFunc("/items", h.Item()).Methods("POST", "GET", "PUT", "DELETE")
+	//Register routes
+	h.HandleFunc("/", h.todoList()).Methods("GET", "DELETE")
+	h.HandleFunc("/item", h.item()).Methods("POST", "GET", "PUT", "DELETE")
 
 	return h
 }
 
+//Handler contains a mux router and storage layer
 type Handler struct {
 	*mux.Router
-
 	store data.Store
 }
 
-func (h *Handler) Item() http.HandlerFunc {
+func (h *Handler) item() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
@@ -60,7 +62,7 @@ func (h *Handler) Item() http.HandlerFunc {
 			w.WriteHeader(http.StatusAccepted)
 			w.Write(result)
 
-		//Read from storage
+		//Read todo item from storage based on UUID from URL parameters
 		case http.MethodGet:
 			key, ok := r.URL.Query()["ID"]
 			if !ok {
@@ -88,7 +90,7 @@ func (h *Handler) Item() http.HandlerFunc {
 
 			w.Write(result)
 
-		//Update Todo item
+		//Update Todo item based on UUID from URL parameters
 		case http.MethodPut:
 			var inputItem models.Item
 
@@ -126,7 +128,7 @@ func (h *Handler) Item() http.HandlerFunc {
 
 			w.Write(result)
 
-		//Delete entry in storage
+		//Delete entry in storage based on UUID
 		case http.MethodDelete:
 			key, ok := r.URL.Query()["ID"]
 			if !ok {
@@ -151,12 +153,12 @@ func (h *Handler) Item() http.HandlerFunc {
 	}
 }
 
-func (h *Handler) TodoList() http.HandlerFunc {
+func (h *Handler) todoList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 
 		switch r.Method {
-		//Read
+		//Read all items on todo list from storage
 		case http.MethodGet:
 			item, err := h.store.GetTodoList()
 			if err != nil {
@@ -172,7 +174,7 @@ func (h *Handler) TodoList() http.HandlerFunc {
 
 			w.Write(result)
 
-		//Delete
+		//Delete entire list of todo items
 		case http.MethodDelete:
 			err := h.store.ClearTodoList()
 			if err != nil {
