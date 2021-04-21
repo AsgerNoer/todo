@@ -30,21 +30,21 @@ Below is an overview of the different requests you can make towards the endpoint
 
 ### Create Item
 ```
-curl --request POST 'localhost:3000/items' \
+curl --request POST 'localhost:3000/item' \
     --header 'Content-Type: application/json' \
     --data-raw '{"ItemText": "NewTask"}'
 ```
 ### Read Item
 ```
-curl --request GET 'localhost:3000/items?ID=UUID'
+curl --request GET 'localhost:3000/item?ID=UUID'
 ```
 ### Update Item
 ```
-curl --request PUT 'localhost:3000/items&ID=UUID \
+curl --request PUT 'localhost:3000/item&ID=UUID \
     --header 'Content-Type: application/json' \
     --data-raw '{"ItemText": "Updated task"}'
 ```
 ### Delete Item
 ```
-    curl --request DELETE 'localhost:3000/items?ID=UUID'
+    curl --request DELETE 'localhost:3000/item?ID=UUID'
 ```
