@@ -12,10 +12,19 @@ import (
 func NewStore() (*Store, error) {
 	var file = "./data.json"
 
-	_, err := os.Create(file)
+	fileinfo, err := os.Stat(file)
+	if os.IsNotExist(err) {
+		newFile, err := os.Create(file)
+		if err != nil {
+			log.Panicf("file cannot be created: %q", err)
+		}
+		defer newFile.Close()
 
-	if err != nil {
-		log.Panicf("Cannot start due to datafile: %q", err)
+		log.Println("new data file added")
+
+		GetTodoList(newFile)
+	} else {
+		log.Printf("datafile found: %q", fileinfo.Name())
 	}
 
 	return &Store{
