@@ -22,6 +22,7 @@ type ItemStore struct {
 	File string
 }
 
+//CreateItem creates item in json file on disk
 func (s *ItemStore) CreateItem(item *models.Item) error {
 
 	file, err := os.Open(s.File)
@@ -49,6 +50,7 @@ func (s *ItemStore) CreateItem(item *models.Item) error {
 	return nil
 }
 
+//ReadItem reads an item from the todo list on disk base on the UUID.
 func (s *ItemStore) ReadItem(ID uuid.UUID) (models.Item, error) {
 	file, err := os.Open(s.File)
 	if err != nil {
@@ -68,6 +70,7 @@ func (s *ItemStore) ReadItem(ID uuid.UUID) (models.Item, error) {
 	return models.Item{}, errors.New("element does not exist")
 }
 
+//UpdateItem updates the item referenced. Item should contain an ID
 func (s *ItemStore) UpdateItem(item *models.Item) error {
 	var itemFound bool
 	var oldText string
@@ -111,6 +114,7 @@ func (s *ItemStore) UpdateItem(item *models.Item) error {
 	return nil
 }
 
+//DeleteItem deletes an item in the array of items contained in the todolist structure
 func (s *ItemStore) DeleteItem(ID uuid.UUID) error {
 	var itemFound bool
 

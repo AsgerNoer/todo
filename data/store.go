@@ -9,6 +9,7 @@ import (
 	"github.com/AsgerNoer/Todo-service/models"
 )
 
+//NewStore returns a Store struck with interfaces to retrive both items and todolist
 func NewStore() (*Store, error) {
 	var file = "./data.json"
 
@@ -33,11 +34,13 @@ func NewStore() (*Store, error) {
 	}, nil
 }
 
+//Store contains interfaces for items and todolist
 type Store struct {
 	models.ItemStore
 	models.TodoListStore
 }
 
+//GetTodoList takes a and returns the data store on disk in a struct
 func GetTodoList(file *os.File) models.TodoList {
 
 	todoList := models.TodoList{}

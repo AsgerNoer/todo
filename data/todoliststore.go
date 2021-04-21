@@ -19,6 +19,7 @@ type TodoListStore struct {
 	File string
 }
 
+//GetTodoList returns the entire todo list from the file system
 func (s *TodoListStore) GetTodoList() (models.TodoList, error) {
 	file, err := os.Open(s.File)
 	if err != nil {
@@ -31,6 +32,7 @@ func (s *TodoListStore) GetTodoList() (models.TodoList, error) {
 	return todoList, nil
 }
 
+//ClearTodoList replaces the current todolist with an empty todolist object
 func (s *TodoListStore) ClearTodoList() error {
 	todoList := models.TodoList{}
 
