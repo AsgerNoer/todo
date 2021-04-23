@@ -9,21 +9,21 @@ import (
 	"github.com/AsgerNoer/Todo-service/models"
 )
 
+const (
+	file string = "./data.json"
+)
+
 //NewStore returns a Store struck with interfaces to retrive both items and todolist
 func NewStore() (*Store, error) {
-	var file = "./data.json"
-
 	fileinfo, err := os.Stat(file)
-	if os.IsNotExist(err) {
-		newFile, err := os.Create(file)
-		if err != nil {
-			log.Panicf("file cannot be created: %q", err)
-		}
-		defer newFile.Close()
 
+	//Check if file exitst
+	if os.IsNotExist(err) {
+		if err := newDataFile(); err != nil {
+			log.Fatalf("Not able to create datafile: %q", err)
+		}
 		log.Println("new data file added")
 
-		GetTodoList(newFile)
 	} else {
 		log.Printf("datafile found: %q", fileinfo.Name())
 	}
@@ -40,6 +40,21 @@ type Store struct {
 	models.TodoListStore
 }
 
+func newDataFile() error {
+	newFile, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	defer newFile.Close()
+
+	result, _ := json.Marshal(models.TodoList{})
+	err = ioutil.WriteFile(newFile.Name(), result, 0077)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 //GetTodoList takes a and returns the data store on disk in a struct
 func GetTodoList(file *os.File) models.TodoList {
 
@@ -50,17 +65,7 @@ func GetTodoList(file *os.File) models.TodoList {
 
 	err := json.Unmarshal(jsonObject, &todoList)
 	if err != nil {
-		if string(jsonObject) == "" {
-			log.Println("json structure not in place. Added empty todolist")
-			result, _ := json.MarshalIndent(todoList, "", "\t")
-			err = ioutil.WriteFile(file.Name(), result, 0077)
-			if err != nil {
-				log.Println(err)
-			}
-		} else {
-			log.Printf("error unmarshalling: %q, %q", err, jsonObject)
-		}
-
+		log.Printf("error unmarshalling: %q, %q", err, jsonObject)
 	}
 	return todoList
 }
