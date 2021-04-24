@@ -14,16 +14,16 @@ import (
 
 //NewHandler returns a Handler struct containing a mux router and data store
 func NewHandler(store *data.Store) *Handler {
-	h := &Handler{
+	handler := &Handler{
 		Router: mux.NewRouter(),
 		store:  *store,
 	}
 
 	//Register routes
-	h.HandleFunc("/", h.todoList()).Methods("GET", "DELETE")
-	h.HandleFunc("/item", h.item()).Methods("POST", "GET", "PUT", "DELETE")
+	handler.HandleFunc("/", handler.todoList()).Methods("GET", "DELETE")
+	handler.HandleFunc("/item", handler.item()).Methods("POST", "GET", "PUT", "DELETE")
 
-	return h
+	return handler
 }
 
 //Handler contains a mux router and storage layer
