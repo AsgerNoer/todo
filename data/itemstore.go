@@ -27,7 +27,7 @@ func (s *ItemStore) CreateItem(item *models.Item) error {
 
 	file, err := os.Open(s.File)
 	if err != nil {
-		log.Printf("error opening file: %q", err)
+		return err
 	}
 	defer file.Close()
 
@@ -41,8 +41,6 @@ func (s *ItemStore) CreateItem(item *models.Item) error {
 	result, _ := json.Marshal(todoList)
 	err = ioutil.WriteFile(s.File, result, 0077)
 	if err != nil {
-		log.Println(err)
-
 		return err
 	}
 
@@ -54,7 +52,7 @@ func (s *ItemStore) CreateItem(item *models.Item) error {
 func (s *ItemStore) ReadItem(ID uuid.UUID) (models.Item, error) {
 	file, err := os.Open(s.File)
 	if err != nil {
-		log.Printf("error opening file: %q", err)
+		return models.Item{}, err
 	}
 	defer file.Close()
 
@@ -78,7 +76,6 @@ func (s *ItemStore) UpdateItem(item *models.Item) error {
 
 	file, err := os.Open(s.File)
 	if err != nil {
-		log.Printf("error opening file: %q", err)
 		return err
 	}
 	defer file.Close()
@@ -98,8 +95,6 @@ func (s *ItemStore) UpdateItem(item *models.Item) error {
 			result, _ := json.Marshal(todoList)
 			err = ioutil.WriteFile(s.File, result, 0077)
 			if err != nil {
-				log.Println(err)
-
 				return err
 			}
 			log.Printf("Task updated: %q updated to %q", oldText, newText)
@@ -120,7 +115,6 @@ func (s *ItemStore) DeleteItem(ID uuid.UUID) error {
 
 	file, err := os.Open(s.File)
 	if err != nil {
-		log.Printf("error opening file: %q", err)
 		return err
 	}
 	defer file.Close()

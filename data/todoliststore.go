@@ -23,7 +23,7 @@ type TodoListStore struct {
 func (s *TodoListStore) GetTodoList() (models.TodoList, error) {
 	file, err := os.Open(s.File)
 	if err != nil {
-		log.Printf("error opening file: %q", err)
+		return models.TodoList{}, err
 	}
 	defer file.Close()
 
@@ -38,7 +38,7 @@ func (s *TodoListStore) ClearTodoList() error {
 
 	file, err := os.Open(s.File)
 	if err != nil {
-		log.Printf("error opening file: %q", err)
+		return err
 	}
 	defer file.Close()
 
