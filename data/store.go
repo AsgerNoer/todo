@@ -41,13 +41,22 @@ type Store struct {
 }
 
 func newDataFile() error {
+	newTodoList := models.TodoList{}
+	testTasks := []string{"Get job", "Build great stuff", "Drink beer"}
 	newFile, err := os.Create(file)
 	if err != nil {
 		return err
 	}
 	defer newFile.Close()
 
-	result, _ := json.Marshal(models.TodoList{})
+	for i := 0; i < len(testTasks); i++ {
+		item := models.Item{}
+		item.NewItem()
+		item.ItemText = testTasks[i]
+
+		newTodoList.Items = append(newTodoList.Items, item)
+	}
+	result, _ := json.Marshal(newTodoList)
 	err = ioutil.WriteFile(newFile.Name(), result, 0077)
 	if err != nil {
 		return err
