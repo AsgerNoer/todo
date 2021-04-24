@@ -3,7 +3,6 @@ package web
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/AsgerNoer/Todo-service/data"
@@ -35,16 +34,21 @@ type Handler struct {
 func (h *Handler) item() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 		switch r.Method {
 		//Create new Todo item
 		case http.MethodPost:
 			var i models.Item
-			jsonObject, _ := ioutil.ReadAll(r.Body)
-
-			err := json.Unmarshal(jsonObject, &i)
+			jsonObject, err := ioutil.ReadAll(r.Body)
 			if err != nil {
-				log.Println(err)
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			err = json.Unmarshal(jsonObject, &i)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
 			}
 
 			err = h.store.CreateItem(&i)
@@ -102,21 +106,27 @@ func (h *Handler) item() http.HandlerFunc {
 
 			ID, err := uuid.Parse(key[0])
 			if err != nil {
-				http.Error(w, "Malformed 'ID'", http.StatusBadRequest)
+				http.Error(w, "Malformed ID", http.StatusBadRequest)
 				return
 			}
 
-			jsonObject, _ := ioutil.ReadAll(r.Body)
+			jsonObject, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
 			err = json.Unmarshal(jsonObject, &inputItem)
 			if err != nil {
-				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
 			}
 
 			inputItem.ID = ID
 
 			err = h.store.UpdateItem(&inputItem)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 
@@ -144,7 +154,7 @@ func (h *Handler) item() http.HandlerFunc {
 
 			err = h.store.DeleteItem(ID)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 
@@ -155,7 +165,7 @@ func (h *Handler) item() http.HandlerFunc {
 
 func (h *Handler) todoList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 
 		switch r.Method {
 		//Read all items on todo list from storage
@@ -168,7 +178,7 @@ func (h *Handler) todoList() http.HandlerFunc {
 
 			result, err := json.Marshal(item)
 			if err != nil {
-				http.Error(w, "Unable to return json", http.StatusInternalServerError)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 
