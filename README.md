@@ -19,11 +19,6 @@ You can see or clear the entire todolist in one go.
 curl --request GET 'localhost:3000/' \
     --header 'Content-Type: application/json'
 ```
-### Clear entire list
-```
-curl --request DELETE 'localhost:3000/' \
-    --header 'Content-Type: application/json'
-```
  
 ## Manage individual tasks
 Below is an overview of the different requests you can make towards the endpoint, that will do CRUD operations on tasks. When creating or updating a task please send the data in json. When doing operations on a task, the UUID of that task has to be in the URL paramters.
@@ -40,9 +35,9 @@ curl --request GET 'localhost:3000/item?ID=UUID'
 ```
 ### Update Item
 ```
-curl --request PUT 'localhost:3000/item&ID=UUID \
+curl --request PUT 'localhost:3000/item' \
     --header 'Content-Type: application/json' \
-    --data-raw '{"ItemText": "Updated task"}'
+    --data-raw '{"id": "UUID","text": "Updated task"}'
 ```
 ### Delete Item
 ```
