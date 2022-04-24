@@ -46,6 +46,7 @@ func NewItemService(r Repository) Service {
 		repo: r,
 	}
 }
+
 func (s *service) ReadAllItems() ([]Item, error) {
 	return s.repo.ReadAllItems()
 }

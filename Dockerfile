@@ -6,7 +6,7 @@ ADD . /app
 
 WORKDIR /app
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/server
 
 FROM alpine:latest AS production 
 
@@ -14,4 +14,4 @@ COPY --from=builder /app .
 
 EXPOSE 3000
 
-ENTRYPOINT [ "./main" ]
+ENTRYPOINT [ "./server" ]

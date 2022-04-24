@@ -14,20 +14,20 @@ func HandleItemCreate(service item.Service) http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		var i Request
+		var req Request
 		jsonObject, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		err = json.Unmarshal(jsonObject, &i)
+		err = json.Unmarshal(jsonObject, &req)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		response, err := service.CreateItem(i.ItemText)
+		response, err := service.CreateItem(req.ItemText)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -114,13 +114,7 @@ func HandleItemUpdate(service item.Service) http.HandlerFunc {
 			return
 		}
 
-		result, err := json.Marshal(req)
-		if err != nil {
-			http.Error(w, "Unable to return json", http.StatusInternalServerError)
-			return
-		}
-
-		_, _ = w.Write(result)
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
