@@ -1,17 +1,24 @@
-package data
+package local
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 
-	"github.com/AsgerNoer/Todo-service/models"
+	"github.com/google/uuid"
 )
 
 const (
 	file string = "./data.json"
 )
+
+//Store contains interfaces for items and todolist
+type Store struct {
+	File string
+}
 
 //NewStore returns a Store struck with interfaces to retrive both items and todolist
 func NewStore() (*Store, error) {
@@ -29,52 +36,60 @@ func NewStore() (*Store, error) {
 	}
 
 	return &Store{
-		ItemStore:     NewItemStore(file),
-		TodoListStore: NewTodoListStore(file),
+		File: file,
 	}, nil
 }
 
-//Store contains interfaces for items and todolist
-type Store struct {
-	models.ItemStore
-	models.TodoListStore
-}
-
 func newDataFile() error {
-	newTodoList := models.TodoList{}
-	testTasks := []string{"Get job", "Build great stuff", "Drink beer"}
+	todoList := []ItemDBModel{}
+	testTasks := []string{"Build great stuff", "Drink beer"}
+
 	newFile, err := os.Create(file)
 	if err != nil {
 		return err
 	}
+
 	defer newFile.Close()
 
-	for i := 0; i < len(testTasks); i++ {
-		item := models.Item{}
-		item.NewItem()
-		item.ItemText = testTasks[i]
+	for _, input := range testTasks {
+		now := time.Now().UTC()
+		newItem := ItemDBModel{
+			ID:       uuid.New(),
+			Added:    now,
+			Updated:  now,
+			ItemText: input,
+		}
 
-		newTodoList.Items = append(newTodoList.Items, item)
+		todoList = append(todoList, newItem)
 	}
-	result, _ := json.Marshal(newTodoList)
+
+	result, err := json.Marshal(todoList)
+	if err != nil {
+		return err
+	}
+
 	err = ioutil.WriteFile(newFile.Name(), result, 0077)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 //GetTodoList takes a and returns the data store on disk in a struct
-func GetTodoList(file *os.File) models.TodoList {
-
-	todoList := models.TodoList{}
+func GetTodoList(file *os.File) ([]ItemDBModel, error) {
+	var todoList []ItemDBModel
 
 	//Open file at unmarshal the content
-	jsonObject, _ := ioutil.ReadAll(file)
-
-	err := json.Unmarshal(jsonObject, &todoList)
+	jsonObject, err := ioutil.ReadAll(file)
 	if err != nil {
-		log.Printf("error unmarshalling: %q, %q", err, jsonObject)
+		return nil, fmt.Errorf("error reading: %v", err)
 	}
-	return todoList
+
+	err = json.Unmarshal(jsonObject, &todoList)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshalling: %v", err)
+	}
+
+	return todoList, nil
 }
